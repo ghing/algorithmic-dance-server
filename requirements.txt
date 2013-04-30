@@ -1,0 +1,2 @@
+gevent-websocket
+# We also require PyOpenNI, but it's not installable via pip
