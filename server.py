@@ -19,9 +19,6 @@ import geventwebsocket
 from openni import (Context, UserGenerator, SkeletonJoint,
         CALIBRATION_STATUS_OK, SKEL_PROFILE_ALL)
 
-# Pose to use to calibrate the user
-pose_to_use = 'Psi'
-
 ctx = Context()
 ctx.init()
 
@@ -31,7 +28,6 @@ user.create(ctx)
 
 # Obtain the skeleton & pose detection capabilities
 skel_cap = user.skeleton_cap
-pose_cap = user.pose_detection_cap
 
 # A set of all connected websockets
 connected_sockets = set()
@@ -64,22 +60,16 @@ def broadcast(msg):
 
 # Declare the callbacks
 def new_user(src, id):
-    print "1/4 User {} detected. Looking for pose..." .format(id)
-    pose_cap.start_detection(pose_to_use, id)
-
-# TODO: Eliminate pose detection if possible
-def pose_detected(src, pose, id):
-    print "2/4 Detected pose {} on user {}. Requesting calibration..." .format(pose,id)
-    pose_cap.stop_detection(id)
+    print "1/3 User {} detected. Requested calibration ..." .format(id)
     skel_cap.request_calibration(id, True)
 
 def calibration_start(src, id):
-    print "3/4 Calibration started for user {}." .format(id)
+    print "2/3 Calibration started for user {}." .format(id)
 
 # TODO: broadcast when a new user is being tracked 
 def calibration_complete(src, id, status):
     if status == CALIBRATION_STATUS_OK:
-        print "4/4 User {} calibrated successfully! Starting to track." .format(id)
+        print "3/3 User {} calibrated successfully! Starting to track." .format(id)
         skel_cap.start_tracking(id)
     else:
         print "ERR User {} failed to calibrate. Restarting process." .format(id)
@@ -91,7 +81,6 @@ def lost_user(src, id):
 
 # Register them
 user.register_user_cb(new_user, lost_user)
-pose_cap.register_pose_detected_cb(pose_detected)
 skel_cap.register_c_start_cb(calibration_start)
 skel_cap.register_c_complete_cb(calibration_complete)
 
