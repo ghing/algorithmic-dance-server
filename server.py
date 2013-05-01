@@ -11,6 +11,8 @@ sending updates about joint position over a websocket.
 """
 import os
 import json
+import errno
+import socket
 import gevent
 from gevent.pywsgi import WSGIServer
 import geventwebsocket
@@ -40,21 +42,25 @@ def broadcast(msg):
     for ws in connected_sockets:
         try:
             ws.send(msg)
-        except geventwebsocket.WebSocketError, ex:
-            print "{0}: {1}".format(ex.__class__.__name__, ex)
-            disconnected.append(ws)
-        except Exception:
-            # Send failed, consider the given socket disconnected
-            # HACK: This will catch other exceptions as well. Is there
-            # a cleaner way to track this?
+        except geventwebsocket.WebSocketError, e:
+            print "{0}: {1}".format(e.__class__.__name__, e)
+        except socket.error, e:
             # It seems like socket.io sends a heartbeat and tracks this.
             # If the current method of detecting disconnections doesn't work,
             # we could try using gevent-socketio instead of gevent-websocket
-            disconnected.append(ws)
+            if isinstance(e.args, tuple):
+                print "errno is %d" % e[0]
+                if e[0] == errno.EPIPE:
+                    # Send failed, consider the given socket disconnected
+                    disconnected.append(ws)
+            else:
+                # Unexpected error, raise it
+                raise e
 
     for ws in disconnected:
         # Remove the disconnected sockets from the set
         connected_sockets.discard(ws)
+
 
 # Declare the callbacks
 def new_user(src, id):
@@ -126,7 +132,11 @@ def ws_handler(environ, start_response):
     try:
         connected_sockets.add(websocket)
         while True:
+            msg = websocket.receive()
+            if msg is None:
+                break
             gevent.sleep(0)
+        connected_sockets.discard(websocket)
         websocket.close()
     except geventwebsocket.WebSocketError, ex:
         print "{0}: {1}".format(ex.__class__.__name__, ex)
