@@ -59,6 +59,49 @@ or
 
 ``python server.py``
 
+API
+---
+
+There are a few different types of messages sent over the websocket.  The
+messages are serialized as JSON strings. The different message types
+are differentiated by a ``type`` property.
+
+Joint
+~~~~~
+
+This type of message is sent when the sensor detects a joint position
+change.
+
+Example:
+
+```
+{
+  type: 'joint',
+  user: 1,
+  joint: 'SKEL_LEFT_HAND',
+  x: 83.32794189453125,
+  y: 25.931610107421875,
+  z: 83.32794189453125
+}
+```
+
+lostUser
+~~~~~~~~
+
+This type of message is sent when the sensor thinks the user is lost. 
+
+Example:
+
+```
+{
+  type: 'lostUser',
+  user: 1
+}
+```
+  
+
+
+
 Why Python
 ----------
 

@@ -78,6 +78,11 @@ def calibration_complete(src, id, status):
 # TODO: broadcast when a user is lost
 def lost_user(src, id):
     print "--- User {} lost." .format(id)
+    msg = {
+        'type': 'lostUser',
+        'user': id,
+    }
+    broadcast(json.dumps(msg))
 
 # Register them
 user.register_user_cb(new_user, lost_user)
@@ -104,6 +109,7 @@ def poll_openni():
                     if skel_cap.is_joint_active(joint):
                         pos = skel_cap.get_joint_position(id, joint)
                         joint_event_msg = {
+                            'type': 'joint',
                             'user': id,
                             'joint': joint_name,
                             'x': pos.point[0],
