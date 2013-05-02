@@ -9,6 +9,7 @@ that user, calibrate the users when they are in the pose, and track them,
 sending updates about joint position over a websocket.
 
 """
+import argparse
 import os
 import json
 import errno
@@ -19,8 +20,20 @@ import geventwebsocket
 from openni import (Context, UserGenerator, SkeletonJoint,
         CALIBRATION_STATUS_OK, SKEL_PROFILE_ALL)
 
+# TODO: move initialization inside a function
+parser = argparse.ArgumentParser(description='Send skeleton information over a WebSocket')
+parser.add_argument('-f', '--file', dest='file', 
+                   help='path to a .oni file to be used for input instead of the camera')
+parser.add_argument('-p', '--port', dest='port', type=int,
+                    default=8080,
+                    help='port to run server on')
+args = parser.parse_args()
+
 ctx = Context()
 ctx.init()
+
+if args.file is not None:
+    ctx.open_file_recording(args.file)
 
 # Create the user generator
 user = UserGenerator()
@@ -96,7 +109,6 @@ skel_cap.set_profile(SKEL_PROFILE_ALL)
 ctx.start_generating_all()
 print "0/4 Starting to detect users. Press Ctrl-C to exit."
 
-
 def poll_openni():
     while True:
         # Update to next frame
@@ -153,4 +165,4 @@ if __name__ == '__main__':
     agent = "gevent-websocket/%s" % (geventwebsocket.__version__)
     print "Running %s from %s" % (agent, path)
     gevent.spawn(poll_openni)
-    WSGIServer(("0.0.0.0", 8080), ws_handler, handler_class=geventwebsocket.WebSocketHandler).serve_forever()
+    WSGIServer(("0.0.0.0", args.port), ws_handler, handler_class=geventwebsocket.WebSocketHandler).serve_forever()
