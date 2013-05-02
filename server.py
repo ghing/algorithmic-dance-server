@@ -114,7 +114,7 @@ def poll_openni():
                             'joint': joint_name,
                             'x': pos.point[0],
                             'y': pos.point[1],
-                            'z': pos.point[0]
+                            'z': pos.point[2]
                         }
                         broadcast(json.dumps(joint_event_msg))
         gevent.sleep(0)
