@@ -65,6 +65,17 @@ or
 
 ``python server.py``
 
+
+With a recorded file
+~~~~~~~~~~~~~~~~~~~~
+
+You can run the server taking input from a saved .oni file instead of from the
+Kinect controller:
+
+```
+./server.py --file /path/to/file.oni
+```
+
 API
 ---
 
