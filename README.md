@@ -34,14 +34,20 @@ Linux distros or Mac OS.
    has useful instructions for installing these dependencies on Ubuntu.
    You can ignore the Processing stuff.
 2. Clone this repo from GitHub
-3. Install [PyOpenNi](https://github.com/jmendeth/PyOpenNI) following its
+3. Fetch the client code from the [submodule](http://git-scm.com/book/en/Git-Tools-Submodules)
+   ```
+   cd /path/to/cloned/repo
+   git submodule init
+   git submodule update
+   ```
+4. Install [PyOpenNi](https://github.com/jmendeth/PyOpenNI) following its
    instructions. Copy the openni.so file in the top-level directory of the 
    cloned repo
-4. Create a virtualenv for this project. By far the easiest way to work
+5. Create a virtualenv for this project. By far the easiest way to work
    with Python dependencies is using virtualenv. In the cloned repo directory
    run ``virtualenv --python=python2.7 venv``.  Then activate the
    virtualenv with ``. ./venv/bin/activate``. 
-5. Install the dependency packages using ``pip install -r requirements.txt``
+6. Install the dependency packages using ``pip install -r requirements.txt``
 
 Usage
 -----
@@ -99,9 +105,6 @@ Example:
 }
 ```
   
-
-
-
 Why Python
 ----------
 
